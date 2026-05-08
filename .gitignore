@@ -72,6 +72,9 @@ TODOS.md
 docs/coherence-audit/
 .plans/
 
+# ── Qogni agent projection (local machine state) ──
+.qogni-agent-projection/
+
 # ── GSD project state (per-worktree, never committed) ──
 .gsd/
 
