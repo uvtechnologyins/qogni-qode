@@ -29,21 +29,65 @@ const GSD_ALIASES = {
   '@gsd/native':          new URL('../dist-test/packages/native/src/index.js', import.meta.url).href,
 };
 
+function splitSpecifierSuffix(specifier) {
+  const queryIndex = specifier.indexOf('?');
+  const hashIndex = specifier.indexOf('#');
+  const cutIndex = queryIndex === -1
+    ? hashIndex
+    : hashIndex === -1
+      ? queryIndex
+      : Math.min(queryIndex, hashIndex);
+  if (cutIndex === -1) return { base: specifier, suffix: '' };
+  return { base: specifier.slice(0, cutIndex), suffix: specifier.slice(cutIndex) };
+}
+
+function isAbsolutePathSpecifier(specifier) {
+  return (
+    specifier.startsWith('/') ||
+    /^[A-Za-z]:[\\/]/.test(specifier) // Windows drive letter
+  );
+}
+
+function isWithinDistTestUrl(urlString) {
+  return typeof urlString === 'string' && urlString.startsWith(DIST_TEST);
+}
+
+function isWithinDistTestPath(pathString) {
+  if (typeof pathString !== 'string') return false;
+  const distTestPath = fileURLToPath(DIST_TEST);
+  return pathString.startsWith(distTestPath);
+}
+
 export function resolve(specifier, context, nextResolve) {
   // 1. @gsd/* bare imports → compiled dist-test counterpart
   if (specifier in GSD_ALIASES) {
     return nextResolve(GSD_ALIASES[specifier], context);
   }
 
-  // 2. .ts relative imports inside dist-test → .js
-  if (
-    specifier.endsWith('.ts') &&
-    (specifier.startsWith('./') || specifier.startsWith('../')) &&
-    context.parentURL &&
-    context.parentURL.startsWith(DIST_TEST)
-  ) {
-    const jsSpecifier = specifier.slice(0, -3) + '.js';
-    return nextResolve(jsSpecifier, context);
+  // 2. .ts imports inside dist-test → .js
+  //    Handles:
+  //    - relative specifiers (./foo.ts, ../foo.ts)
+  //    - cache-busting query strings (../foo.ts?ts=123)
+  //    - file URLs (file:///.../foo.ts)
+  //    - absolute paths (/.../foo.ts)
+  const { base, suffix } = splitSpecifierSuffix(specifier);
+  if (base.endsWith('.ts')) {
+    const parentInDistTest = isWithinDistTestUrl(context.parentURL);
+    const baseIsRel = base.startsWith('./') || base.startsWith('../');
+    const baseIsFileUrl = base.startsWith('file:');
+    const baseIsAbsPath = isAbsolutePathSpecifier(base);
+
+    let baseInDistTest = false;
+    if (baseIsFileUrl) {
+      baseInDistTest = isWithinDistTestPath(fileURLToPath(base));
+    } else if (baseIsAbsPath) {
+      baseInDistTest = isWithinDistTestPath(base);
+    }
+
+    if ((parentInDistTest && baseIsRel) || baseInDistTest) {
+      const jsBase = base.slice(0, -3) + '.js';
+      return nextResolve(jsBase + suffix, context);
+    }
   }
 
   return nextResolve(specifier, context);
