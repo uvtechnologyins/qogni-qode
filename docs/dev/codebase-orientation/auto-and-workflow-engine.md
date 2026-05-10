@@ -51,11 +51,11 @@ This is the “shape” of auto-mode, independent of the evolving implementation
 flowchart TD
   A[/gsd auto/] --> B[bootstrapAutoSession]
   B --> C{advance loop}
-  C --> D[deriveState (DB-first)]
+  C --> D["deriveState (DB-first)"]
   D --> E[resolveDispatch rule]
   E -->|stop| Z[exit]
   E -->|dispatch| F[select model + build prompt]
-  F --> G[new Pi session (fresh context)]
+  F --> G["new Pi session (fresh context)"]
   G --> H[agent executes tools/code]
   H --> I[post-unit hooks + verification]
   I --> J[persist DB + projections]
