@@ -27,6 +27,12 @@ npm run gsd -- --version
 npm run gsd
 ```
 
+If you plan to run tests or `npm run typecheck:extensions`, build the workspace packages once first:
+
+```bash
+npm run build:pi
+```
+
 ## 1) Prerequisites
 
 ### Required
@@ -164,6 +170,7 @@ Windows note: `scripts/build-web-if-stale.cjs` skips building the staged web hos
 Primary commands (root):
 
 ```bash
+npm run build:pi         # required once after clone/pull (see note below)
 npm test              # unit + integration + package tests
 npm run test:unit      # compiles to dist-test/ then runs node --test
 npm run test:integration
@@ -181,6 +188,7 @@ npm run test:e2e
 Notes:
 - Tests primarily use Node’s built-in runner (`node --test`).
 - Many unit tests run from compiled artifacts under `dist-test/` (see `scripts/compile-tests.mjs` and the `test:unit:compiled` script in `package.json`).
+- `npm test` runs `npm run typecheck:extensions` first (`package.json#scripts.pretest`). That typecheck expects workspace package type declarations under `packages/*/dist/*.d.ts`, which are produced by `npm run build:pi`.
 
 ### 3.6 Linting / typechecking
 
@@ -298,6 +306,7 @@ If you’re new to the process, start by reading `docs/dev/ci-cd-pipeline.md` an
 
 - **Node engine enforcement**: `.npmrc` has `engine-strict=true`; wrong Node versions will fail installs.
 - **Use `npm ci`**: if you see `Cannot find module '@gsd/*'`, re-run `npm ci` to restore workspace wiring (see `CONTRIBUTING.md`).
+- **Many TS2307/TS7006 errors when running tests/typecheck**: if `npm test` or `npm run typecheck:extensions` reports lots of `Cannot find module '@gsd/…'` and `Parameter … implicitly has an 'any' type` inside `src/resources/extensions/**`, run `npm run build:pi` to generate the workspace packages’ `dist/` (including `.d.ts`) and retry.
 - **Oh My Zsh alias conflict**: some setups alias `gsd` to `git svn dcommit`; check `alias gsd` and `unalias gsd`, or run `gsd-cli` instead (`docs/user-docs/getting-started.md`).
 - **Playwright download**: installing can pull Chromium; use `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1` (or `npx gsd-pi --skip-chromium` for installer flows) when you don’t need browser tools.
 - **Managed RTK binary**: GSD may install/manage `rtk`; disable with `GSD_RTK_DISABLED=1` (see `README.md` and `scripts/install.js`).
