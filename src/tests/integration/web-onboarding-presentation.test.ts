@@ -1,7 +1,15 @@
 import test from "node:test"
 import assert from "node:assert/strict"
 
-const { getOnboardingPresentation } = await import("../../../web/lib/gsd-workspace-store.tsx")
+async function loadGetOnboardingPresentation(t: import("node:test").TestContext) {
+  try {
+    const mod = await import("../../../web/lib/gsd-workspace-store.tsx")
+    return mod.getOnboardingPresentation as (state: any) => any
+  } catch {
+    t.skip("requires web dependencies (run `npm --prefix web ci`)")
+    return null
+  }
+}
 
 function makeOnboardingState(overrides: Record<string, unknown> = {}) {
   return {
@@ -56,10 +64,13 @@ function makeState(overrides: Record<string, unknown> = {}) {
       onboarding: makeOnboardingState(),
     },
     ...overrides,
-  } as Parameters<typeof getOnboardingPresentation>[0]
+  }
 }
 
-test("getOnboardingPresentation prefers bridge refresh pending over saving_api_key", () => {
+test("getOnboardingPresentation prefers bridge refresh pending over saving_api_key", async (t) => {
+  const getOnboardingPresentation = await loadGetOnboardingPresentation(t)
+  if (!getOnboardingPresentation) return
+
   const presentation = getOnboardingPresentation(
     makeState({
       onboardingRequestState: "saving_api_key",
@@ -114,7 +125,10 @@ test("getOnboardingPresentation prefers bridge refresh pending over saving_api_k
   assert.equal(presentation.label, "Refreshing bridge auth")
 })
 
-test("getOnboardingPresentation still shows validating when save is in flight and onboarding has not advanced", () => {
+test("getOnboardingPresentation still shows validating when save is in flight and onboarding has not advanced", async (t) => {
+  const getOnboardingPresentation = await loadGetOnboardingPresentation(t)
+  if (!getOnboardingPresentation) return
+
   const presentation = getOnboardingPresentation(
     makeState({
       onboardingRequestState: "saving_api_key",

@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { EventEmitter } from "node:events";
-import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { accessSync, constants, mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { PassThrough } from "node:stream";
@@ -25,6 +25,23 @@ const bootRoute = await import("../../../web/app/api/boot/route.ts");
 const onboardingRoute = await import("../../../web/app/api/onboarding/route.ts");
 const commandRoute = await import("../../../web/app/api/session/command/route.ts");
 const { AuthStorage } = await import("@gsd/pi-coding-agent");
+
+function ensureWebBuildDepsOrSkip(t: import("node:test").TestContext): boolean {
+  const nextBin = join(
+    repoRoot,
+    "web",
+    "node_modules",
+    ".bin",
+    process.platform === "win32" ? "next.cmd" : "next",
+  );
+  try {
+    accessSync(nextBin, constants.X_OK);
+    return true
+  } catch {
+    t.skip("requires web dependencies and an executable `next` (run `npm --prefix web ci`)")
+    return false
+  }
+}
 
 class FakeRpcChild extends EventEmitter {
   stdin = new PassThrough();
@@ -448,6 +465,7 @@ test("fresh gsd --web browser onboarding stays locked on failed validation and u
     t.skip("runtime launch test uses POSIX browser-open stubs")
     return
   }
+  if (!ensureWebBuildDepsOrSkip(t)) return
 
   const tempRoot = mkdtempSync(join(tmpdir(), "gsd-web-onboarding-runtime-"))
   const tempHome = join(tempRoot, "home")

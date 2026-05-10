@@ -2,7 +2,7 @@
 
 import test from "node:test";
 import assert from "node:assert/strict";
-import { mkdirSync, writeFileSync, existsSync, readFileSync, rmSync, chmodSync } from "node:fs";
+import { mkdirSync, writeFileSync, existsSync, readFileSync, rmSync, chmodSync, unlinkSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { randomUUID } from "node:crypto";
@@ -878,6 +878,19 @@ test("reconcileMergeState returns blocked and notifies error when nativeCommit f
   const objectsDir = join(base, ".git", "objects");
   chmodSync(objectsDir, 0o444);
   t.after(() => { try { chmodSync(objectsDir, 0o755); } catch { /* cleanup */ } });
+
+  // When running as root (or on filesystems that ignore chmod), the permission
+  // change may not prevent writes, making this failure-mode test non-deterministic.
+  // Verify the directory is actually unwritable before asserting the blocked path.
+  try {
+    const probePath = join(objectsDir, `__write_probe_${randomUUID()}`);
+    writeFileSync(probePath, "probe");
+    unlinkSync(probePath);
+    t.skip("unable to make .git/objects read-only in this environment");
+    return;
+  } catch {
+    // Expected: write should fail.
+  }
 
   const { ctx, notifications } = makeMockCtx();
   const result = reconcileMergeState(base, ctx);
