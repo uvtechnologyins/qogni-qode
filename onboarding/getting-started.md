@@ -189,6 +189,7 @@ Notes:
 - Tests primarily use Node’s built-in runner (`node --test`).
 - Many unit tests run from compiled artifacts under `dist-test/` (see `scripts/compile-tests.mjs` and the `test:unit:compiled` script in `package.json`).
 - `npm test` runs `npm run typecheck:extensions` first (`package.json#scripts.pretest`). That typecheck expects workspace package type declarations under `packages/*/dist/*.d.ts`, which are produced by `npm run build:core` (not just `build:pi`).
+- Some `web/`-focused integration tests are skipped unless `web/` dependencies are installed (`npm --prefix web ci`).
 
 ### 3.6 Linting / typechecking
 
