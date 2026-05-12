@@ -17,6 +17,7 @@ repowise.db-*
 # ── GSD project state (development-only, lives in worktree branches) ──
 package-lock.json
 .claude/
+.qogni-agent-projection/
 RELEASE-GUIDE.md
 *.tgz
 *.tsbuildinfo
