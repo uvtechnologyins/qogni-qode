@@ -329,6 +329,31 @@ export async function readDoctorHistory(basePath: string, lastN = 50): Promise<D
   } catch { return []; }
 }
 
+/**
+ * Runs the GSD "doctor" health checks for a project and returns a structured report.
+ *
+ * Optionally applies fixes for fixable issues when `options.fix` is enabled.
+ * This function also appends a summary entry to the doctor history log.
+ *
+ * @param {string} basePath - Project root path used to resolve `.gsd/` state and artifacts.
+ * @param {object} [options] - Optional execution flags.
+ * @param {boolean} [options.fix] - Apply fixable remediations in-place.
+ * @param {boolean} [options.dryRun] - Detect issues but do not write changes (even if `fix` is true).
+ * @param {string} [options.scope] - When set, disables remote environment checks.
+ * @param {"task"|"all"} [options.fixLevel] - Limits which classes of issues can be auto-fixed.
+ * @param {"none"|"worktree"|"branch"} [options.isolationMode] - Git isolation mode used for certain checks.
+ * @param {boolean} [options.includeBuild] - Include build checks in environment validation.
+ * @param {boolean} [options.includeTests] - Include test checks in environment validation.
+ * @returns {Promise<DoctorReport>} The computed doctor report, including issues, fixes, and timing data.
+ * @throws {Error} When a health check or fix operation fails unexpectedly.
+ * @example
+ * ```ts
+ * import { runGSDDoctor } from "./doctor.js";
+ *
+ * const report = await runGSDDoctor(process.cwd(), { fix: false });
+ * console.log(report.ok ? "OK" : "Issues found:", report.issues.length);
+ * ```
+ */
 export async function runGSDDoctor(basePath: string, options?: { fix?: boolean; dryRun?: boolean; scope?: string; fixLevel?: "task" | "all"; isolationMode?: "none" | "worktree" | "branch"; includeBuild?: boolean; includeTests?: boolean }): Promise<DoctorReport> {
   const issues: DoctorIssue[] = [];
   const fixesApplied: string[] = [];

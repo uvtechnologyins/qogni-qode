@@ -59,6 +59,19 @@ function hasVertexAdcCredentials(): boolean {
  * Get API key for provider from known environment variables, e.g. OPENAI_API_KEY.
  *
  * Will not return API keys for providers that require OAuth tokens.
+ *
+ * For providers that use non-key auth (e.g. ADC/credentials files), this may
+ * return the sentinel string `"<authenticated>"` to indicate auth is configured.
+ *
+ * @param {KnownProvider | string} provider - Provider identifier (e.g. `"openai"`, `"anthropic"`).
+ * @returns {string | undefined} API key value, `"<authenticated>"`, or `undefined` when not configured.
+ * @example
+ * ```ts
+ * import { getEnvApiKey } from "./env-api-keys.js";
+ *
+ * const key = getEnvApiKey("openai");
+ * if (!key) console.log("Missing OPENAI_API_KEY");
+ * ```
  */
 export function getEnvApiKey(provider: KnownProvider): string | undefined;
 export function getEnvApiKey(provider: string): string | undefined;

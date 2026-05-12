@@ -220,7 +220,21 @@ export function resolveCanonicalMilestoneRoot(
  * Create a new git worktree under .gsd/worktrees/<name>/ with branch worktree/<name>.
  * The branch is created from the current HEAD of the main branch.
  *
- * @param opts.branch — override the default `worktree/<name>` branch name
+ * @param {string} basePath - Project root used to run git operations and resolve `.gsd/worktrees/`.
+ * @param {string} name - Worktree name (directory name and default branch suffix).
+ * @param {object} [opts] - Optional behavior overrides.
+ * @param {string} [opts.branch] - Override the default `worktree/<name>` branch name.
+ * @param {string} [opts.startPoint] - Git ref/commit used as the starting point (defaults to detected main branch).
+ * @param {boolean} [opts.reuseExistingBranch] - When the branch already exists, attach without force-resetting it.
+ * @returns {WorktreeInfo} Metadata for the created worktree (path, branch, and existence).
+ * @throws {GSDError} When validation fails or git operations error.
+ * @example
+ * ```ts
+ * import { createWorktree } from "./worktree-manager.js";
+ *
+ * const info = createWorktree(process.cwd(), "milestone-123");
+ * console.log(info.branch, info.path);
+ * ```
  */
 export function createWorktree(basePath: string, name: string, opts: { branch?: string; startPoint?: string; reuseExistingBranch?: boolean } = {}): WorktreeInfo {
   basePath = normalizeBasePathForWorktreeOps(basePath);
@@ -487,6 +501,21 @@ export function findNestedGitDirs(rootPath: string): string[] {
 /**
  * Remove a worktree and optionally delete its branch.
  * If the process is currently inside the worktree, chdir out first.
+ *
+ * @param {string} basePath - Project root used to run git operations and resolve `.gsd/worktrees/`.
+ * @param {string} name - Worktree name to remove.
+ * @param {object} [opts] - Optional removal behavior.
+ * @param {boolean} [opts.deleteBranch] - When true, deletes the associated branch (default: true).
+ * @param {boolean} [opts.force] - When true, forces removal if needed (default: true).
+ * @param {string} [opts.branch] - Branch name to remove (defaults to `worktree/<name>`).
+ * @returns {void} No return value.
+ * @throws {GSDError} When the worktree cannot be removed safely.
+ * @example
+ * ```ts
+ * import { removeWorktree } from "./worktree-manager.js";
+ *
+ * removeWorktree(process.cwd(), "milestone-123");
+ * ```
  */
 export function removeWorktree(
   basePath: string,

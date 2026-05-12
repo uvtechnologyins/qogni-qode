@@ -584,6 +584,19 @@ function isMilestoneArtifactPath(file: string, milestoneId: string): boolean {
  * complete-slice requires both SUMMARY and UAT files — verifying only
  * the summary allowed the unit to be marked complete when the LLM
  * skipped writing the UAT file (see #176).
+ *
+ * @param {string} unitType - Workflow unit type (e.g. `"execute-task"`, `"complete-slice"`).
+ * @param {string} unitId - Unit identifier (e.g. `"M001/S01/T01"`).
+ * @param {string} base - Project root used to resolve `.gsd/` artifact paths.
+ * @returns {boolean} `true` if all required artifacts exist (or are not applicable).
+ * @throws {Error} When filesystem reads fail unexpectedly.
+ * @example
+ * ```ts
+ * import { verifyExpectedArtifact } from "./auto-recovery.js";
+ *
+ * const ok = verifyExpectedArtifact("complete-milestone", "M001", process.cwd());
+ * if (!ok) console.log("Expected artifact missing");
+ * ```
  */
 export function verifyExpectedArtifact(
   unitType: string,

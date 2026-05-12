@@ -44,6 +44,18 @@ function resolveSliceArtifactPath(
 
 /**
  * Resolve the expected artifact for a unit to an absolute path.
+ *
+ * @param {string} unitType - Workflow unit type (e.g. `"plan-slice"`, `"execute-task"`).
+ * @param {string} unitId - Unit identifier (e.g. `"M001/S01/T01"`).
+ * @param {string} base - Project root used to resolve `.gsd/` state and artifacts.
+ * @returns {string | null} Absolute artifact path, or `null` when the unit has no single artifact.
+ * @example
+ * ```ts
+ * import { resolveExpectedArtifactPath } from "./auto-artifact-paths.js";
+ *
+ * const p = resolveExpectedArtifactPath("complete-milestone", "M001", process.cwd());
+ * console.log(p);
+ * ```
  */
 export function resolveExpectedArtifactPath(
   unitType: string,

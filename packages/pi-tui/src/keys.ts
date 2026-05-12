@@ -677,8 +677,18 @@ function parseKeyId(keyId: string): { key: string; ctrl: boolean; shift: boolean
  *
  * Use the Key helper for autocomplete: Key.ctrl("c"), Key.escape, Key.ctrlShift("p")
  *
- * @param data - Raw input data from terminal
- * @param keyId - Key identifier (e.g., "ctrl+c", "escape", Key.ctrl("c"))
+ * @param {string} data - Raw input data from the terminal.
+ * @param {KeyId} keyId - Key identifier (e.g. `"ctrl+c"`, `"escape"`, `Key.ctrl("c")`).
+ * @returns {boolean} `true` when `data` matches `keyId`.
+ * @example
+ * ```ts
+ * import { matchesKey, Key } from "@gsd/pi-tui";
+ *
+ * const data = "\u0003"; // Ctrl+C
+ * if (matchesKey(data, Key.ctrl("c"))) {
+ *   // handle cancel
+ * }
+ * ```
  */
 export function matchesKey(data: string, keyId: KeyId): boolean {
 	const parsed = parseKeyId(keyId);

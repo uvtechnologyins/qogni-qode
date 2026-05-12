@@ -294,6 +294,18 @@ export interface DeriveStateOptions {
  * When DB is available, queries milestone/slice/task tables directly.
  * Legacy filesystem parsing is available only through an explicit opt-in for
  * tests/recovery flows; runtime must not silently infer state from markdown.
+ *
+ * @param {string} basePath - Project root used to resolve `.gsd/` state and artifacts.
+ * @param {DeriveStateOptions} [opts] - Optional read-path routing configuration.
+ * @returns {Promise<GSDState>} Current derived workflow state for the project.
+ * @throws {Error} When reading or parsing required state artifacts fails.
+ * @example
+ * ```ts
+ * import { deriveState } from "./state.js";
+ *
+ * const state = await deriveState(process.cwd());
+ * console.log(state.phase);
+ * ```
  */
 export async function deriveState(
   basePath: string,
@@ -651,6 +663,25 @@ function checkReplanTrigger(basePath: string, milestoneId: string, sliceId: stri
   return !!sliceRow?.replan_triggered_at;
 }
 
+/**
+ * Derives the current GSD state using only the authoritative database tables.
+ *
+ * This path is used when the DB is open and available; it does not attempt any
+ * implicit markdown parsing fallback.
+ *
+ * @param {string} basePath - Project root path used for resolving certain artifact-derived signals.
+ * @returns {Promise<GSDState>} Current derived workflow state for the project.
+ * @throws {Error} When the DB is unavailable or a query fails.
+ * @example
+ * ```ts
+ * import { openDatabase } from "./gsd-db.js";
+ * import { deriveStateFromDb } from "./state.js";
+ *
+ * openDatabase("/path/to/project/.gsd/gsd.db");
+ * const state = await deriveStateFromDb("/path/to/project");
+ * console.log(state.activeMilestone?.id);
+ * ```
+ */
 export async function deriveStateFromDb(basePath: string): Promise<GSDState> {
   const requirements = getRequirementCounts();
 

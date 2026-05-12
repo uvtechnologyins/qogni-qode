@@ -29,6 +29,27 @@ const GSD_ALIASES = {
   '@gsd/native':          new URL('../dist-test/packages/native/src/index.js', import.meta.url).href,
 };
 
+/**
+ * Node.js ESM loader resolve hook for running compiled tests under `dist-test/`.
+ *
+ * Redirects:
+ * - `@gsd/*` bare imports to their compiled `dist-test/` entrypoints
+ * - relative `*.ts` imports within `dist-test/` to `*.js` so Node can load the compiled output
+ *
+ * @param {string} specifier - Import specifier being resolved.
+ * @param {object} context - Loader context, including `parentURL`.
+ * @param {(specifier: string, context: any) => any} nextResolve - Next resolver in the chain.
+ * @returns {any} The resolved module record returned by `nextResolve`.
+ * @example
+ * ```js
+ * import { spawnSync } from "node:child_process";
+ *
+ * // Register the hook when running compiled tests:
+ * spawnSync(process.execPath, ["--import", "./scripts/dist-test-resolve.mjs", "--test"], {
+ *   stdio: "inherit",
+ * });
+ * ```
+ */
 export function resolve(specifier, context, nextResolve) {
   // 1. @gsd/* bare imports → compiled dist-test counterpart
   if (specifier in GSD_ALIASES) {

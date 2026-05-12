@@ -29,6 +29,23 @@ const VALID_UOK_TURN_ACTIONS = new Set<"commit" | "snapshot" | "status-only">([
   "status-only",
 ]);
 
+/**
+ * Validates and normalizes a raw GSD preferences object.
+ *
+ * This is a pure function: it does not read from disk or merge preference files.
+ * Unknown keys are ignored (with warnings), and known keys are coerced into a
+ * sanitized preferences object alongside any validation errors.
+ *
+ * @param {GSDPreferences} preferences - Raw preferences object to validate.
+ * @returns {{ preferences: GSDPreferences; errors: string[]; warnings: string[] }} Validated preferences plus any errors and warnings.
+ * @example
+ * ```ts
+ * import { validatePreferences } from "./preferences-validation.js";
+ *
+ * const { preferences, errors, warnings } = validatePreferences({ mode: "solo" } as any);
+ * console.log(errors.length, warnings.length, preferences.mode);
+ * ```
+ */
 export function validatePreferences(preferences: GSDPreferences): {
   preferences: GSDPreferences;
   errors: string[];

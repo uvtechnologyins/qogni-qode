@@ -16,6 +16,20 @@ export function navigateToGSDView(view: GSDViewName): void {
  * store (e.g. `sendCommand(buildPromptCommand(command, bridge))`), so the
  * command is processed by the agent session — not just injected as raw PTY
  * keystrokes.
+ *
+ * @param {{ dispatch: () => Promise<unknown> }} params - Execution parameters.
+ * @param {() => Promise<unknown>} params.dispatch - Dispatch function that sends the workflow command.
+ * @returns {void} No return value.
+ * @example
+ * ```ts
+ * import { executeWorkflowActionInPowerMode } from "./workflow-action-execution"
+ *
+ * executeWorkflowActionInPowerMode({
+ *   dispatch: async () => {
+ *     // sendCommand(buildPromptCommand("doctor", bridge))
+ *   },
+ * })
+ * ```
  */
 export function executeWorkflowActionInPowerMode({
   dispatch,

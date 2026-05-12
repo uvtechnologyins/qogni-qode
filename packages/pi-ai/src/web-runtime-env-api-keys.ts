@@ -26,6 +26,15 @@ function hasVertexAdcCredentials(): boolean {
  * shared pi-ai runtime because the packaged Next standalone server turns that
  * pattern into a failing "Cannot find module as expression is too dynamic"
  * runtime branch.
+ *
+ * @param {KnownProvider | string} provider - Provider identifier to look up.
+ * @returns {string | undefined} API key value, `"<authenticated>"`, or `undefined` when not configured.
+ * @example
+ * ```ts
+ * import { getEnvApiKey } from "./web-runtime-env-api-keys.js";
+ *
+ * console.log(getEnvApiKey("openai"));
+ * ```
  */
 export function getEnvApiKey(provider: KnownProvider): string | undefined;
 export function getEnvApiKey(provider: string): string | undefined;
