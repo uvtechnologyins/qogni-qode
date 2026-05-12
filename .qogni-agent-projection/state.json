@@ -4,7 +4,10 @@
       "target_path": "/var/tmp/qogni-cowork/worktrees/965b-code-mapper/qogni-qode/.qogni/agent/SOUL.md"
     },
     {
-      "target_path": "/var/tmp/qogni-cowork/worktrees/965b-code-mapper/qogni-qode/.qogni/agent/references/documentation-coverage-heuristics.md"
+      "target_path": "/var/tmp/qogni-cowork/worktrees/965b-code-mapper/qogni-qode/.qogni/agent/references/jsdoc-standards.md"
+    },
+    {
+      "target_path": "/var/tmp/qogni-cowork/worktrees/965b-code-mapper/qogni-qode/.qogni/agent/templates/readme-template.md"
     },
     {
       "target_path": "/var/tmp/qogni-cowork/worktrees/965b-code-mapper/qogni-qode/.qogni/agent/manifest.json"
