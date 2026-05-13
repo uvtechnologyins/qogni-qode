@@ -11,6 +11,16 @@ import { evaluateWebProxyAuth } from "./lib/proxy-auth"
  *
  * Additionally, if an `Origin` header is present, it must match the expected
  * localhost origin to prevent cross-site request forgery.
+ *
+ * @param {NextRequest} request - Incoming Next.js request for an `/api/*` route.
+ * @returns {NextResponse | undefined} Auth failure response (JSON) or `NextResponse.next()`.
+ * @example
+ * ```ts
+ * import { proxy, config } from "./proxy"
+ *
+ * export default proxy
+ * export { config }
+ * ```
  */
 export function proxy(request: NextRequest): NextResponse | undefined {
   const decision = evaluateWebProxyAuth({

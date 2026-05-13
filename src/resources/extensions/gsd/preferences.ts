@@ -146,6 +146,26 @@ export function loadProjectGSDPreferences(basePath?: string): LoadedGSDPreferenc
     ?? loadPreferencesFile(legacyProjectPreferencesPathLowercase(basePath), "project");
 }
 
+/**
+ * Loads and merges global and project-level GSD preferences.
+ *
+ * Merge order: global defaults → project overrides. After merging, applies
+ * token-profile and mode defaults as the lowest-priority layer so explicit user
+ * preferences always win.
+ *
+ * @param {string} [basePath] - Project root used to locate the project preferences file.
+ * @param {object} [opts] - Optional inputs for default resolution.
+ * @param {string[]} [opts.availableModelIds] - Model IDs available in the current runtime for token-profile defaults.
+ * @returns {LoadedGSDPreferences | null} The effective preferences and origin metadata, or `null` if none exist.
+ * @throws {Error} When a preferences file exists but cannot be read or parsed.
+ * @example
+ * ```ts
+ * import { loadEffectiveGSDPreferences } from "./preferences.js";
+ *
+ * const prefs = loadEffectiveGSDPreferences(process.cwd());
+ * console.log(prefs?.preferences.mode);
+ * ```
+ */
 export function loadEffectiveGSDPreferences(
   basePath?: string,
   opts?: { availableModelIds?: string[] },

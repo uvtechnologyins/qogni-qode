@@ -65,10 +65,21 @@ export function formatSize(bytes: number): string {
  *
  * Never returns partial lines. If first line exceeds byte limit,
  * returns empty content with firstLineExceedsLimit=true.
+ *
+ * @param {string} content - Input text to truncate.
+ * @param {TruncationOptions} [options] - Optional truncation limits.
+ * @returns {TruncationResult} Truncation result including metadata about limits and output size.
+ * @example
+ * ```ts
+ * import { truncateHead } from "./truncate.js";
+ *
+ * const { content, truncated } = truncateHead("a\\n".repeat(10_000), { maxLines: 10 });
+ * console.log(truncated, content.split(\"\\n\").length);
+ * ```
  */
 export function truncateHead(content: string, options: TruncationOptions = {}): TruncationResult {
-	const maxLines = options.maxLines ?? DEFAULT_MAX_LINES;
-	const maxBytes = options.maxBytes ?? DEFAULT_MAX_BYTES;
+  const maxLines = options.maxLines ?? DEFAULT_MAX_LINES;
+  const maxBytes = options.maxBytes ?? DEFAULT_MAX_BYTES;
 
 	const totalBytes = Buffer.byteLength(content, "utf-8");
 	const lines = content.split("\n");

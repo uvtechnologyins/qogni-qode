@@ -286,6 +286,22 @@ function parseSliceOverviewTable(body: string): {
   return { slices, malformedDepends };
 }
 
+/**
+ * Parses a milestone roadmap markdown document into a structured representation.
+ *
+ * Supports both legacy H3-based "## Slices" formatting and the newer
+ * "## Slice Overview" table emitted by workflow projections.
+ *
+ * @param {string} content - Full markdown contents of `ROADMAP.md`.
+ * @returns {ParsedRoadmap} Parsed roadmap sections, slices, and template-token flags.
+ * @example
+ * ```ts
+ * import { parseRoadmap } from "./parsers.js";
+ *
+ * const parsed = parseRoadmap("## Slices\\n\\n### S01 — Setup\\n- Risk: low\\n");
+ * console.log(parsed.slices.map((s) => s.id));
+ * ```
+ */
 export function parseRoadmap(content: string): ParsedRoadmap {
   const { sections, order } = splitH2Sections(content);
   const tokens = detectTemplateTokens(sections);

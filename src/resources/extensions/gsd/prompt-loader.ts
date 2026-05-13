@@ -168,8 +168,18 @@ scheduleWarmCache();
 /**
  * Load a prompt template and substitute variables.
  *
- * @param name - Template filename without .md extension (e.g. "execute-task")
- * @param vars - Key-value pairs to substitute for {{key}} placeholders
+ * @param {string} name - Template filename without `.md` extension (e.g. `"execute-task"`).
+ * @param {Record<string, string>} [vars] - Key/value substitutions for `{{key}}` placeholders.
+ * @returns {string} The rendered prompt text with substitutions applied.
+ * @throws {GSDError} When the template declares placeholders that were not provided in `vars`.
+ * @throws {Error} When the template file cannot be read from disk.
+ * @example
+ * ```ts
+ * import { loadPrompt } from "./prompt-loader.js";
+ *
+ * const prompt = loadPrompt("execute-task", { workingDirectory: process.cwd() });
+ * console.log(prompt.slice(0, 80));
+ * ```
  */
 export function loadPrompt(name: string, vars: Record<string, string> = {}): string {
   let content = templateCache.get(name);

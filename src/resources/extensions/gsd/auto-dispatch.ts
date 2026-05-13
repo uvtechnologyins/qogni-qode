@@ -1462,6 +1462,25 @@ import { getRegistry } from "./rule-registry.js";
  * Delegates to the RuleRegistry when initialized; falls back to inline
  * loop over DISPATCH_RULES for backward compatibility (tests that import
  * resolveDispatch directly without registry initialization).
+ *
+ * @param {DispatchContext} ctx - Dispatch context (state, preferences, and project metadata).
+ * @returns {Promise<DispatchAction>} The next action to take (`dispatch`, `stop`, or `skip`).
+ * @throws {Error} When a matching rule requires building a prompt and prompt construction fails.
+ * @example
+ * ```ts
+ * import { deriveState } from "./state.js";
+ * import { loadEffectiveGSDPreferences } from "./preferences.js";
+ * import { resolveDispatch } from "./auto-dispatch.js";
+ *
+ * const basePath = process.cwd();
+ * const state = await deriveState(basePath);
+ * const prefs = loadEffectiveGSDPreferences(basePath)?.preferences;
+ *
+ * const mid = state.activeMilestone?.id ?? "M001";
+ * const midTitle = state.activeMilestone?.title ?? "";
+ * const action = await resolveDispatch({ basePath, mid, midTitle, state, prefs });
+ * console.log(action.action);
+ * ```
  */
 export async function resolveDispatch(
   ctx: DispatchContext,

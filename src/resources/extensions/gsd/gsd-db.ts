@@ -578,6 +578,26 @@ export function getDbStatus(): {
   };
 }
 
+/**
+ * Opens a SQLite database file and initializes the schema for the current process.
+ *
+ * If a DB is already open for the same `path`, this is a no-op and returns `true`.
+ * If a different path is open, the existing connection is closed before opening
+ * the new one. When the primary provider fails to open the file, a fallback
+ * provider may be attempted. For file-backed DBs, malformed-schema errors may
+ * trigger a best-effort VACUUM recovery retry.
+ *
+ * @param {string} path - Absolute path (or `":memory:"`) to the SQLite database.
+ * @returns {boolean} `true` when the DB is open and ready for queries; otherwise `false`.
+ * @throws {Error} When opening the database or initializing the schema fails.
+ * @example
+ * ```ts
+ * import { openDatabase, getDbStatus } from "./gsd-db.js";
+ *
+ * openDatabase("/path/to/project/.gsd/gsd.db");
+ * console.log(getDbStatus().available);
+ * ```
+ */
 export function openDatabase(path: string): boolean {
   _dbOpenState.markAttempted();
   if (currentDb && currentPath !== path) closeDatabase();

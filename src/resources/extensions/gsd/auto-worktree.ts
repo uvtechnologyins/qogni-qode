@@ -1253,6 +1253,19 @@ export function createAutoWorktree(
 /**
  * Teardown an auto-worktree: chdir back to original base, then remove
  * the worktree and its branch.
+ *
+ * @param {string} originalBasePath - Project root path to restore as the current working directory.
+ * @param {string} milestoneId - Milestone identifier used to locate the auto-worktree and branch.
+ * @param {object} [opts] - Optional teardown behavior.
+ * @param {boolean} [opts.preserveBranch] - When true, keeps the auto-worktree branch instead of deleting it.
+ * @returns {void} No return value.
+ * @throws {GSDError} When the process cannot restore the working directory or remove the worktree.
+ * @example
+ * ```ts
+ * import { teardownAutoWorktree } from "./auto-worktree.js";
+ *
+ * teardownAutoWorktree("/path/to/project", "M001", { preserveBranch: true });
+ * ```
  */
 export function teardownAutoWorktree(
   originalBasePath: string,
@@ -1561,6 +1574,12 @@ function autoCommitDirtyState(cwd: string): boolean {
  * On "nothing to commit" after squash: safe only if milestone work is already
  * on the integration branch.  Throws if unanchored code changes would be lost.
  *
+ * @param {string} originalBasePath_ - Project root path to return to for the merge into main.
+ * @param {string} milestoneId - Milestone identifier (e.g. `"M001"`) whose branch/worktree should be merged.
+ * @param {string} roadmapContent - Roadmap markdown used to build the rich merge commit message.
+ * @returns {{ commitMessage: string; pushed: boolean; prCreated: boolean; codeFilesChanged: boolean }} Merge outcome metadata.
+ * @throws {MergeConflictError} When a squash-merge produces conflicts that require manual resolution.
+ * @throws {GSDError} When git or filesystem operations fail (e.g. checkout, commit, teardown).
  * @internal **Do not call directly.** This is the inner squash-merge primitive
  * for the Worktree Lifecycle Module (ADR-016 phase 2 / A3, issue #5619).
  * Production callers must go through `WorktreeLifecycle.mergeMilestoneStandalone`
