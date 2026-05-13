@@ -27,6 +27,109 @@ One command. Walk away. Come back to a built project with clean git history.
 
 ---
 
+## Overview
+
+GSD (Get Shit Done) is a standalone CLI coding agent that can plan and execute milestones end-to-end using a local SQLite state machine and a `.gsd/` project workspace. It runs interactively (step mode) or autonomously (auto mode), with multi-provider LLM support via OAuth or API keys.
+
+## Features
+
+- Interactive CLI with slash commands (`gsd`, `/gsd`, `/login`, `/model`)
+- Step mode (`/gsd`) and autonomous mode (`/gsd auto`) driven by a SQLite-backed state machine (`gsd.db`)
+- Git automation: branch/worktree isolation, clean squash merges, and crash-resilient resume
+- Built-in verification hooks and cost/token tracking for long-running work
+- Extensible architecture: bundled extensions + third-party extensions under `.gsd/extensions/`
+- Optional integrations: MCP server (`@gsd-build/mcp-server`), daemon + Discord (`@gsd-build/daemon`), web UI (`web/`), VS Code extension (`vscode-extension/`)
+
+## Prerequisites
+
+- Node.js `>=22` (see `package.json#engines.node`)
+- npm (the repo pins `npm@10.9.3` via `package.json#packageManager`)
+- Git (required for branch/worktree workflows)
+- Optional (from-source builds): Rust toolchain for `@gsd/native` (`native/`, `packages/native/`)
+
+## Installation
+
+### Global install (recommended)
+
+```bash
+npm install -g gsd-pi@latest
+```
+
+### From source (repo dev)
+
+```bash
+npm ci
+npm run build
+npm run gsd
+```
+
+## Usage
+
+```bash
+# Start an interactive session
+gsd
+
+# Authenticate, then pick a model
+/login
+/model
+
+# Run one step at a time (wizard between units)
+/gsd
+
+# Run fully autonomous (walk away)
+/gsd auto
+```
+
+Programmatic usage (SDK):
+
+```ts
+import { createAgentSession, InteractiveMode } from "@gsd/pi-coding-agent";
+
+const { session } = await createAgentSession();
+const ui = new InteractiveMode(session, {});
+await ui.run();
+```
+
+## Project Structure
+
+```text
+.
+├── src/                 Main CLI/runtime (TypeScript) + bundled resources
+├── packages/             Workspace packages (pi-* SDKs, daemon, MCP server, etc.)
+├── extensions/           Optional extensions published as workspaces
+├── web/                  Web UI (Next.js)
+├── vscode-extension/     VS Code extension
+├── native/               Rust crates + build scripts for native N-API modules
+├── scripts/              Build/test/release tooling
+├── docs/                 Developer + user documentation (including ADRs)
+├── docs-sprint/          Documentation audit outputs for this repo
+├── tests/                Smoke/e2e/live test runners
+├── dist/                 Compiled output (published artifacts)
+├── pkg/                  Packaging outputs
+├── docker/               Docker helpers and images
+├── studio/               Electron-Vite studio app (local UI sandbox)
+├── gitbook/              GitBook documentation sources
+└── mintlify-docs/        Mintlify documentation sources
+```
+
+## API Reference
+
+Most users interact via the `gsd` CLI. For embedding GSD/Pi components or building integrations, these are the most important exported APIs:
+
+| Export | What it is | Source |
+|--------|------------|--------|
+| `main()` (`@gsd/pi-coding-agent`) | Coding-agent CLI entry point | [packages/pi-coding-agent/src/main.ts](packages/pi-coding-agent/src/main.ts) |
+| `createAgentSession()` (`@gsd/pi-coding-agent`) | Creates an `AgentSession` with tools, models, extensions | [packages/pi-coding-agent/src/core/sdk.ts](packages/pi-coding-agent/src/core/sdk.ts) |
+| `AgentSession` (`@gsd/pi-coding-agent`) | Session lifecycle shared by interactive/print/RPC modes | [packages/pi-coding-agent/src/core/agent-session.ts](packages/pi-coding-agent/src/core/agent-session.ts) |
+| `stream()` / `complete()` (`@gsd/pi-ai`) | Streaming and non-streaming LLM calls for a `Model` + `Context` | [packages/pi-ai/src/stream.ts](packages/pi-ai/src/stream.ts) |
+| `getModel()` (`@gsd/pi-ai`) | Looks up a static model definition by provider + model id | [packages/pi-ai/src/models/index.ts](packages/pi-ai/src/models/index.ts) |
+| `getEnvApiKey()` (`@gsd/pi-ai`) | Resolves provider credentials from env vars | [packages/pi-ai/src/env-api-keys.ts](packages/pi-ai/src/env-api-keys.ts) |
+| `TUI` (`@gsd/pi-tui`) | Differential terminal UI renderer | [packages/pi-tui/src/tui.ts](packages/pi-tui/src/tui.ts) |
+| `createMcpServer()` (`@gsd-build/mcp-server`) | Registers GSD orchestration tools on an MCP server | [packages/mcp-server/src/server.ts](packages/mcp-server/src/server.ts) |
+| `Daemon` (`@gsd-build/daemon`) | Background daemon lifecycle (project scan + optional Discord bot) | [packages/daemon/src/daemon.ts](packages/daemon/src/daemon.ts) |
+
+---
+
 ## What's New in v2.82
 
 ### State Reconciliation & Drift Detection (ADR-017)
@@ -619,6 +722,30 @@ An auto-generated `index.html` shows all reports with progression metrics across
 
 ## Configuration
 
+### Environment variables
+
+| Variable | Purpose | Default |
+|----------|---------|---------|
+| `GSD_HOME` | Global state directory (sessions, auth, logs) | `~/.gsd` |
+| `GSD_STATE_DIR` | Override external project-state root (`projects/<id>/...`) | unset (falls back to `GSD_HOME`) |
+| `GSD_PROJECT_ID` | Override stable repo identity used for external state | unset (derived from git remote/local root) |
+| `GSD_RTK_DISABLED` | Force-disable RTK shell-output compression | unset |
+| `RTK_TELEMETRY_DISABLED` | Disables RTK telemetry for managed invocations | set to `1` when RTK is used |
+| `GSD_BIN_PATH` | Override `gsd` binary path for parallel/orchestrator helpers | unset |
+| `GSD_WORKFLOW_PROJECT_ROOT` | Base path for `@gsd-build/mcp-server` workflow/write-gate resolution | unset (falls back to `process.cwd()`) |
+| `GSD_WORKFLOW_WRITE_GATE_MODULE` | Optional write-gate module path/URL for MCP `ask_user_questions` flows | unset |
+
+Provider credentials can also be supplied via env vars (for example `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`/`ANTHROPIC_OAUTH_TOKEN`, `OPENROUTER_API_KEY`, `GEMINI_API_KEY`, `COPILOT_GITHUB_TOKEN`). The canonical mapping lives in [packages/pi-ai/src/env-api-keys.ts](packages/pi-ai/src/env-api-keys.ts).
+
+### Config files and directories
+
+- `~/.gsd/` (or `$GSD_HOME`): global state root (sessions, auth, caches)
+- `~/.gsd/agent/auth.json`: stored OAuth tokens / API key credentials (local)
+- `~/.gsd/agent/models.json`: model registry cache for interactive selection
+- `~/.gsd/PREFERENCES.md`: global preferences
+- `.gsd/PREFERENCES.md`: per-project preferences
+- `.gsd/`: project workspace and projections (notably `gsd.db`, `STATE.md`, `ROADMAP.md`, `KNOWLEDGE.md`, reports)
+
 ### Preferences
 
 GSD preferences live in `~/.gsd/PREFERENCES.md` (global) or `.gsd/PREFERENCES.md` (project). Manage with `/gsd prefs`.
@@ -918,6 +1045,12 @@ Use expensive models where quality matters (planning, complex execution) and che
 </a>
 
 ---
+
+## Contributing
+
+- See `CONTRIBUTING.md` for development workflow, repo conventions, and release process.
+- Local setup: `npm ci` then `npm run build`
+- Run tests: `npm test` (or `npm run test:unit`, `npm run test:integration` for narrower scopes)
 
 ## License
 
