@@ -96,6 +96,11 @@ async function copyAssets(srcDir, destDir) {
     if (entry.isDirectory()) {
       await copyAssets(srcPath, destPath);
     } else {
+      // dist-test runs unit tests from compiled JS output. If we also copy
+      // source `.test.mjs` files into dist-test, Node's test runner may pick
+      // them up (depending on glob patterns) and they can import `.ts` files
+      // that Node cannot execute without `--experimental-strip-types`.
+      if (entry.name.endsWith('.test.mjs')) continue;
       await mkdir(destDir, { recursive: true });
       await cp(srcPath, destPath, { force: true });
     }
@@ -324,6 +329,9 @@ async function main() {
   // Regex matches .ts in from/import() strings but not sourceMappingURL comments
   const tsImportRe = /(from\s+["'])(\.\.?\/[^"']*?)\.ts(["'])/g;
   const tsDynImportRe = /(import\(["'])(\.\.?\/[^"']*?)\.ts(["'])\)/g;
+  // Covers import(`../foo.ts?cacheBust=${...}`) template literals used by tests.
+  const tsDynImportTemplateQueryRe = /(import\(`[^`]*?)\.ts(\?[^`]*?`\))/g;
+  const tsDynImportTemplateNoQueryRe = /(import\(`[^`]*?)\.ts(`\))/g;
 
   let rewritten = 0;
   await Promise.all(compiledJsFiles.map(async (file) => {
@@ -331,8 +339,11 @@ async function main() {
     const out = src
       .replace(tsImportRe,   (_, a, b, c) => `${a}${b}.js${c}`)
       .replace(tsDynImportRe, (_, a, b, c) => `${a}${b}.js${c})`);
-    if (out !== src) {
-      await writeFile(file, out, 'utf-8');
+    const outWithTemplates = out
+      .replace(tsDynImportTemplateQueryRe, (_, a, b) => `${a}.js${b}`)
+      .replace(tsDynImportTemplateNoQueryRe, (_, a, b) => `${a}.js${b}`);
+    if (outWithTemplates !== src) {
+      await writeFile(file, outWithTemplates, 'utf-8');
       rewritten++;
     }
   }));
@@ -355,6 +366,7 @@ async function main() {
     try { distEntries = await readdir(distDir, { withFileTypes: true }); } catch { continue; }
     for (const entry of distEntries) {
       if (!entry.isFile()) continue;
+      // Unit tests run from compiled JS; remove any stale compiled outputs.
       if (!entry.name.match(/\.test\.(js|ts)$/)) continue;
       const stem = entry.name.replace(/\.(js|ts)$/, '');
       // Source could be .ts or .mjs (esbuild compiles both to .js)
@@ -364,6 +376,15 @@ async function main() {
         await rm(join(distDir, entry.name));
         staleCleaned++;
       }
+    }
+
+    // Also ensure `.test.mjs` sources are not present in dist-test; the runner
+    // should execute the compiled `.test.js` output instead.
+    for (const entry of distEntries) {
+      if (!entry.isFile()) continue;
+      if (!entry.name.endsWith('.test.mjs')) continue;
+      await rm(join(distDir, entry.name));
+      staleCleaned++;
     }
   }
   if (staleCleaned > 0) {

@@ -1,5 +1,15 @@
 import type { WorkspaceTerminalLine } from "./gsd-workspace-store"
-import { getUserMode } from "./use-user-mode"
+
+type UserMode = "expert" | "vibe-coder"
+const USER_MODE_STORAGE_KEY = "gsd-user-mode"
+const DEFAULT_USER_MODE: UserMode = "expert"
+
+function getUserMode(): UserMode {
+  if (typeof window === "undefined") return DEFAULT_USER_MODE
+  const stored = globalThis.localStorage?.getItem(USER_MODE_STORAGE_KEY)
+  if (stored === "expert" || stored === "vibe-coder") return stored
+  return DEFAULT_USER_MODE
+}
 
 export type GSDViewName = "dashboard" | "power" | "chat" | "roadmap" | "files" | "activity" | "visualize"
 

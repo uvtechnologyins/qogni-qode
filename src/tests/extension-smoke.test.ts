@@ -13,6 +13,7 @@
 
 import test from "node:test";
 import assert from "node:assert/strict";
+import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
@@ -47,7 +48,11 @@ test("all bundled extensions can be imported without throwing", async () => {
     }
 
     try {
-      await import(pathToFileURL(entryPath).href);
+      const importPath =
+        entryPath.endsWith(".ts") && existsSync(entryPath.slice(0, -3) + ".js")
+          ? entryPath.slice(0, -3) + ".js"
+          : entryPath;
+      await import(pathToFileURL(importPath).href);
     } catch (err) {
       failures.push({
         path: relPath,

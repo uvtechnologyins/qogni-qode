@@ -83,16 +83,17 @@ export function createAwaitTool(getManager: () => AsyncJobManager): ToolDefiniti
 
 			// Wait for at least one to complete, or timeout
 			const TIMEOUT_SENTINEL = Symbol("timeout");
+			let timeoutHandle: ReturnType<typeof setTimeout> | undefined;
 			const timeoutPromise = new Promise<typeof TIMEOUT_SENTINEL>((resolve) => {
-				const timer = setTimeout(() => resolve(TIMEOUT_SENTINEL), timeoutMs);
-				// Allow the process to exit even if the timer is pending
-				if (typeof timer === "object" && "unref" in timer) timer.unref();
+				timeoutHandle = setTimeout(() => resolve(TIMEOUT_SENTINEL), timeoutMs);
 			});
 
 			const raceResult = await Promise.race([
 				Promise.race(running.map((j) => j.promise)).then(() => "completed" as const),
 				timeoutPromise,
-			]);
+			]).finally(() => {
+				if (timeoutHandle) clearTimeout(timeoutHandle);
+			});
 
 			const timedOut = raceResult === TIMEOUT_SENTINEL;
 
