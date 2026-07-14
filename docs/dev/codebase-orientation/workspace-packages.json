@@ -1,0 +1,122 @@
+{
+  "schemaVersion": 1,
+  "workspaceGlobs": [
+    "packages/*",
+    "extensions/*"
+  ],
+  "packages": [
+    {
+      "name": "gsd-pi",
+      "path": "package.json",
+      "kind": "app",
+      "bin": {
+        "gsd": "dist/loader.js",
+        "gsd-cli": "dist/loader.js",
+        "gsd-pi": "scripts/install.js"
+      }
+    },
+    {
+      "name": "@gsd-build/contracts",
+      "path": "packages/contracts/package.json",
+      "kind": "library",
+      "linkable": true
+    },
+    {
+      "name": "@gsd-build/rpc-client",
+      "path": "packages/rpc-client/package.json",
+      "kind": "library",
+      "linkable": true
+    },
+    {
+      "name": "@gsd-build/mcp-server",
+      "path": "packages/mcp-server/package.json",
+      "kind": "service",
+      "linkable": true,
+      "bin": {
+        "gsd-mcp-server": "./dist/cli.js"
+      }
+    },
+    {
+      "name": "@gsd-build/daemon",
+      "path": "packages/daemon/package.json",
+      "kind": "service",
+      "bin": {
+        "gsd-daemon": "./dist/cli.js"
+      }
+    },
+    {
+      "name": "@gsd/native",
+      "path": "packages/native/package.json",
+      "kind": "library",
+      "linkable": true
+    },
+    {
+      "name": "@gsd/pi-agent-core",
+      "path": "packages/pi-agent-core/package.json",
+      "kind": "library",
+      "linkable": true
+    },
+    {
+      "name": "@gsd/pi-ai",
+      "path": "packages/pi-ai/package.json",
+      "kind": "library",
+      "linkable": true
+    },
+    {
+      "name": "@gsd/pi-tui",
+      "path": "packages/pi-tui/package.json",
+      "kind": "library",
+      "linkable": true
+    },
+    {
+      "name": "@gsd/pi-coding-agent",
+      "path": "packages/pi-coding-agent/package.json",
+      "kind": "library",
+      "linkable": true
+    },
+    {
+      "name": "@gsd-extensions/google-search",
+      "path": "extensions/google-search/package.json",
+      "kind": "extension"
+    }
+  ],
+  "internalDependencyEdges": [
+    {
+      "from": "@gsd-build/daemon",
+      "to": "@gsd-build/contracts"
+    },
+    {
+      "from": "@gsd-build/daemon",
+      "to": "@gsd-build/rpc-client"
+    },
+    {
+      "from": "@gsd-build/mcp-server",
+      "to": "@gsd-build/contracts"
+    },
+    {
+      "from": "@gsd-build/mcp-server",
+      "to": "@gsd-build/rpc-client"
+    },
+    {
+      "from": "@gsd-build/rpc-client",
+      "to": "@gsd-build/contracts"
+    },
+    {
+      "from": "@gsd/pi-coding-agent",
+      "to": "@gsd-build/contracts"
+    },
+    {
+      "from": "@gsd-extensions/google-search",
+      "to": "@gsd/pi-coding-agent"
+    },
+    {
+      "from": "@gsd-extensions/google-search",
+      "to": "@gsd/pi-tui"
+    }
+  ],
+  "notes": [
+    "This is a high-level snapshot of workspace packages and their internal edges (derived from declared dependencies).",
+    "Bundled extensions that ship inside `src/resources/extensions/` are not workspace packages; see `extensions-manifests.json` for their manifest-declared surface."
+  ]
+}
+

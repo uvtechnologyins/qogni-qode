@@ -1,0 +1,260 @@
+{
+  "schemaVersion": 1,
+  "root": "src/resources/extensions",
+  "manifestCount": 14,
+  "manifests": [
+    {
+      "dir": "async-jobs",
+      "id": "async-jobs",
+      "name": "Async Jobs",
+      "version": "1.0.0",
+      "tier": "bundled",
+      "deprecated": false,
+      "requires": {
+        "platform": ">=2.29.0"
+      },
+      "provides": {
+        "toolsCount": 3,
+        "commandsCount": 1,
+        "hooksCount": 3,
+        "shortcutsCount": 0
+      },
+      "manifestPath": "src/resources/extensions/async-jobs/extension-manifest.json"
+    },
+    {
+      "dir": "bg-shell",
+      "id": "bg-shell",
+      "name": "Background Shell",
+      "version": "1.0.0",
+      "tier": "bundled",
+      "deprecated": false,
+      "requires": {
+        "platform": ">=2.29.0"
+      },
+      "provides": {
+        "toolsCount": 1,
+        "commandsCount": 1,
+        "hooksCount": 9,
+        "shortcutsCount": 1
+      },
+      "manifestPath": "src/resources/extensions/bg-shell/extension-manifest.json"
+    },
+    {
+      "dir": "browser-tools",
+      "id": "browser-tools",
+      "name": "Browser Tools",
+      "version": "1.0.0",
+      "tier": "bundled",
+      "deprecated": false,
+      "requires": {
+        "platform": ">=2.29.0"
+      },
+      "provides": {
+        "toolsCount": 59,
+        "commandsCount": 0,
+        "hooksCount": 2,
+        "shortcutsCount": 0
+      },
+      "manifestPath": "src/resources/extensions/browser-tools/extension-manifest.json"
+    },
+    {
+      "dir": "context7",
+      "id": "context7",
+      "name": "Context7",
+      "version": "1.0.0",
+      "tier": "bundled",
+      "deprecated": false,
+      "requires": {
+        "platform": ">=2.29.0"
+      },
+      "provides": {
+        "toolsCount": 2,
+        "commandsCount": 0,
+        "hooksCount": 2,
+        "shortcutsCount": 0
+      },
+      "manifestPath": "src/resources/extensions/context7/extension-manifest.json"
+    },
+    {
+      "dir": "google-search",
+      "id": "google-search",
+      "name": "Google Search (deprecated stub)",
+      "version": "1.0.0",
+      "tier": "bundled",
+      "deprecated": true,
+      "requires": {
+        "platform": ">=2.29.0"
+      },
+      "provides": {
+        "toolsCount": 0,
+        "commandsCount": 0,
+        "hooksCount": 1,
+        "shortcutsCount": 0
+      },
+      "manifestPath": "src/resources/extensions/google-search/extension-manifest.json"
+    },
+    {
+      "dir": "gsd",
+      "id": "gsd",
+      "name": "GSD Workflow",
+      "version": "1.0.0",
+      "tier": "core",
+      "deprecated": false,
+      "requires": {
+        "platform": ">=2.29.0"
+      },
+      "provides": {
+        "toolsCount": 8,
+        "commandsCount": 4,
+        "hooksCount": 14,
+        "shortcutsCount": 1
+      },
+      "manifestPath": "src/resources/extensions/gsd/extension-manifest.json"
+    },
+    {
+      "dir": "mac-tools",
+      "id": "mac-tools",
+      "name": "Mac Tools",
+      "version": "1.0.0",
+      "tier": "bundled",
+      "deprecated": false,
+      "requires": {
+        "platform": ">=2.29.0"
+      },
+      "provides": {
+        "toolsCount": 12,
+        "commandsCount": 0,
+        "hooksCount": 1,
+        "shortcutsCount": 0
+      },
+      "manifestPath": "src/resources/extensions/mac-tools/extension-manifest.json"
+    },
+    {
+      "dir": "remote-questions",
+      "id": "remote-questions",
+      "name": "Remote Questions",
+      "version": "1.0.0",
+      "tier": "bundled",
+      "deprecated": false,
+      "requires": {
+        "platform": ">=2.29.0"
+      },
+      "provides": {
+        "toolsCount": 0,
+        "commandsCount": 1,
+        "hooksCount": 0,
+        "shortcutsCount": 0
+      },
+      "manifestPath": "src/resources/extensions/remote-questions/extension-manifest.json"
+    },
+    {
+      "dir": "search-the-web",
+      "id": "search-the-web",
+      "name": "Web Search",
+      "version": "1.0.0",
+      "tier": "bundled",
+      "deprecated": false,
+      "requires": {
+        "platform": ">=2.29.0"
+      },
+      "provides": {
+        "toolsCount": 4,
+        "commandsCount": 1,
+        "hooksCount": 3,
+        "shortcutsCount": 0
+      },
+      "manifestPath": "src/resources/extensions/search-the-web/extension-manifest.json"
+    },
+    {
+      "dir": "slash-commands",
+      "id": "slash-commands",
+      "name": "Slash Commands",
+      "version": "1.0.0",
+      "tier": "bundled",
+      "deprecated": false,
+      "requires": {
+        "platform": ">=2.29.0"
+      },
+      "provides": {
+        "toolsCount": 0,
+        "commandsCount": 4,
+        "hooksCount": 0,
+        "shortcutsCount": 0
+      },
+      "manifestPath": "src/resources/extensions/slash-commands/extension-manifest.json"
+    },
+    {
+      "dir": "subagent",
+      "id": "subagent",
+      "name": "Subagent",
+      "version": "1.0.0",
+      "tier": "bundled",
+      "deprecated": false,
+      "requires": {
+        "platform": ">=2.29.0"
+      },
+      "provides": {
+        "toolsCount": 1,
+        "commandsCount": 1,
+        "hooksCount": 1,
+        "shortcutsCount": 0
+      },
+      "manifestPath": "src/resources/extensions/subagent/extension-manifest.json"
+    },
+    {
+      "dir": "ttsr",
+      "id": "ttsr",
+      "name": "Time Traveling Stream Rules",
+      "version": "1.0.0",
+      "tier": "bundled",
+      "deprecated": false,
+      "requires": {
+        "platform": ">=2.29.0"
+      },
+      "provides": {
+        "toolsCount": 0,
+        "commandsCount": 0,
+        "hooksCount": 5,
+        "shortcutsCount": 0
+      },
+      "manifestPath": "src/resources/extensions/ttsr/extension-manifest.json"
+    },
+    {
+      "dir": "universal-config",
+      "id": "universal-config",
+      "name": "Universal Config",
+      "version": "1.0.0",
+      "tier": "bundled",
+      "deprecated": false,
+      "requires": {
+        "platform": ">=2.29.0"
+      },
+      "provides": {
+        "toolsCount": 1,
+        "commandsCount": 1,
+        "hooksCount": 1,
+        "shortcutsCount": 0
+      },
+      "manifestPath": "src/resources/extensions/universal-config/extension-manifest.json"
+    },
+    {
+      "dir": "voice",
+      "id": "voice",
+      "name": "Voice",
+      "version": "1.0.0",
+      "tier": "bundled",
+      "deprecated": false,
+      "requires": {
+        "platform": ">=2.29.0"
+      },
+      "provides": {
+        "toolsCount": 0,
+        "commandsCount": 1,
+        "hooksCount": 0,
+        "shortcutsCount": 1
+      },
+      "manifestPath": "src/resources/extensions/voice/extension-manifest.json"
+    }
+  ]
+}
+
